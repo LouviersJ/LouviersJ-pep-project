@@ -1,5 +1,8 @@
 package Controller;
-
+import Model.Account;
+import Model.Message;
+import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,10 +44,6 @@ public class SocialMediaController {
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
     private void postAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
@@ -84,18 +83,21 @@ public class SocialMediaController {
     }
 
     private void getMessageHandler(Context ctx) {
-        Message message = messageService.getMessage(ctx.pathParam("message_id"));
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = messageService.getMessage(message_id);
         ctx.json(message).status(200);
     }
     private void deleteMessageHandler(Context ctx) {
-        Message message = messageService.deleteMessage(ctx.pathParam("message_id"));
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = messageService.deleteMessage(message_id);
         ctx.json(message).status(200);
     }
 
     private void updateMessageHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
-        Message updatedMessage = messageService.updateMessage(message, ctx.pathParam("message_id"));
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message updatedMessage = messageService.updateMessage(message, "message_id");
         if(updatedMessage != null){
             ctx.json(mapper.writeValueAsString(updatedMessage)).status(200);
         }else{
@@ -104,7 +106,8 @@ public class SocialMediaController {
     }
 
     private void getAccountMessagesHandler(Context ctx) {
-        List<Message> messages = accountService.getAccountMessages();
+        int account_id = Integer.parseInt(ctx.pathParam("account_id"));
+        List<Message> messages = accountService.getAccountMessages("account_id");
         ctx.json(messages).status(200);
     }
 }
