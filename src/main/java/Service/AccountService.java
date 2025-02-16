@@ -1,5 +1,6 @@
 package Service;
 import Model.Account;
+import Model.Message;
 import DAO.AccountDAO;
 import java.util.List;
 
@@ -7,7 +8,7 @@ public class AccountService {
     private AccountDAO accountDAO;
 
     public AccountService(){
-        accountDAO = new AccountDAO;
+        accountDAO = new AccountDAO();
     }
 
     public AccountService(AccountDAO accountDAO){

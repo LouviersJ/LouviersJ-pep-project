@@ -7,7 +7,7 @@ public class MessageService {
     private MessageDAO messageDAO;
 
     public MessageService(){
-        messageDAO = new MessageDAO;
+        messageDAO = new MessageDAO();
     }
 
     public MessageService(MessageDAO messageDAO){

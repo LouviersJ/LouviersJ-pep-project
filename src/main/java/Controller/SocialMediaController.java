@@ -37,9 +37,9 @@ public class SocialMediaController {
         app.post("/messages", this :: postMessageHandler);
         app.get("/messages", this :: getMessagesHandler);
         app.get("/messages/{message_id}", this :: getMessageHandler);
-        app.delete("/messages/{message_id}", deleteMessageHandler);
-        app.patch("/messages/{message_id}", updateMessageHandler);
-        app.get("/accounts/{account_id}/messages", getAccountMessagesHandler);
+        app.delete("/messages/{message_id}", this :: deleteMessageHandler);
+        app.patch("/messages/{message_id}", this :: updateMessageHandler);
+        app.get("/accounts/{account_id}/messages", this :: getAccountMessagesHandler);
         app.start(8080);
         return app;
     }
@@ -97,7 +97,7 @@ public class SocialMediaController {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
-        Message updatedMessage = messageService.updateMessage(message, "message_id");
+        Message updatedMessage = messageService.updateMessage(message, message_id);
         if(updatedMessage != null){
             ctx.json(mapper.writeValueAsString(updatedMessage)).status(200);
         }else{
@@ -107,7 +107,7 @@ public class SocialMediaController {
 
     private void getAccountMessagesHandler(Context ctx) {
         int account_id = Integer.parseInt(ctx.pathParam("account_id"));
-        List<Message> messages = accountService.getAccountMessages("account_id");
+        List<Message> messages = accountService.getAccountMessages(account_id);
         ctx.json(messages).status(200);
     }
 }
