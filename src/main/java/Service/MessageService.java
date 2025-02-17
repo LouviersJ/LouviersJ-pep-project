@@ -30,8 +30,8 @@ public class MessageService {
         return messageDAO.deleteMessage(message_id);
     }
 
-    public Message updateMessage(Message message, int message_id){
-        return messageDAO.updatedMessage(message, message_id);
+    public Message updateMessage(String message_text, int message_id){
+        return messageDAO.updateMessage(message_text, message_id);
     }
 }
 
