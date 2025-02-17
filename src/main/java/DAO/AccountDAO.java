@@ -9,23 +9,28 @@ import java.util.List;
 public class AccountDAO {
 
     public Account addAccount(Account account){
-        if(account.getPassword().length() < 4)
+        if(account.getPassword().length() < 4 | account.getUsername().strip() == "")
             return null;
 
         try(Connection connection = ConnectionUtil.getConnection()) {
             String sql = "INSERT INTO account(username, password) VALUES(?, ?);";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, account.getUsername());
             preparedStatement.setString(2, account.getPassword());
             
             preparedStatement.executeUpdate();
 
-            return account;
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return null;
+            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
+            if(pkeyResultSet.next()){
+                int generated_account_id = (int) pkeyResultSet.getInt(1);
+                return new Account(generated_account_id, account.getUsername(), account.getPassword());
+            }
+
+            return null;
+        }catch(SQLException e){return null;}
+        
     }
 
     public Account checkAccount(Account account){
@@ -38,12 +43,16 @@ public class AccountDAO {
             
             ResultSet rs = preparedStatement.executeQuery();
 
-            if(rs.next())
-                return account;
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return null;
+            if(rs.next()){
+                return new Account(
+                                rs.getInt("account_id"),
+                                rs.getString("username"),
+                                rs.getString("password"));
+            }
+
+
+            return null;
+        }catch(SQLException e){return null;}
     }
 
     public List<Message> getAccountMessages(int account_id){
@@ -64,10 +73,9 @@ public class AccountDAO {
                                             rs.getLong("time_posted_epoch"));
                 messages.add(message);
             }
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return messages;
+            return messages;
+        }catch(SQLException e){return null;}
+        
     }
 
 }
